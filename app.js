@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Connect to MongoDB 
-mongoose.connect('your_database_url', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/', { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
@@ -105,4 +105,22 @@ app.put('/patients/:patientId/vitals', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+  
+  // 5. View details of a specific patient
+  app.get('/patients/:patientId', async (req, res) => {
+    try {
+      const patient = await Patient.findOne({ patientId: req.params.patientId });
+      if (!patient) {
+        return res.status(404).json({ error: 'Patient not found' });
+      }
+  
+      res.status(200).json(patient);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
+  // Start the server
+  app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
   
