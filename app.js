@@ -57,3 +57,41 @@ app.post('/patients', async (req, res) => {
   }
 });
 
+/ 2. Start an encounter for a patient
+app.post('/patients/:patientId/encounters', async (req, res) => {
+  try {
+    const patient = await Patient.findOne({ patientId: req.params.patientId });
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    const encounter = req.body;
+    patient.encounters.push(encounter);
+    await patient.save();
+
+    res.status(201).json(encounter);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// 3. Submit patient vitals by nurse
+app.put('/patients/:patientId/vitals', async (req, res) => {
+    try {
+      const patient = await Patient.findOne({ patientId: req.params.patientId });
+      if (!patient) {
+        return res.status(404).json({ error: 'Patient not found' });
+      }
+  
+      const vitals = req.body;
+      patient.encounters[patient.encounters.length - 1].vitals = vitals;
+      await patient.save();
+  
+      res.status(200).json(vitals);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
