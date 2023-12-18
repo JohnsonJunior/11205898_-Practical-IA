@@ -95,3 +95,14 @@ app.put('/patients/:patientId/vitals', async (req, res) => {
     }
   });
   
+  // 4. View a list of patients
+  app.get('/patients', async (req, res) => {
+    try {
+      const patients = await Patient.find();
+      res.status(200).json(patients);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
